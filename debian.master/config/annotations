@@ -127,7 +127,6 @@ CONFIG_DMI                                      policy<{'amd64': 'y', 'arm64': '
 CONFIG_KEXEC                                    policy<{'amd64': 'y', 'arm64': 'y', 'armhf': 'y', 'i386': 'y', 'ppc64el': 'y', 's390x': 'y'}>
 CONFIG_CRASH_DUMP                               policy<{'amd64': 'y', 'arm64': 'y', 'armhf': 'y', 'i386': 'y', 'ppc64el': 'y', 's390x': 'y'}>
 #
-CONFIG_CRASH_DUMP                               mark<ENFORCED> note<LP:1363180>
 CONFIG_EFI                                      flag<REVIEW>
 
 # Menu: Boot options >> Architecture: arm
@@ -1403,7 +1402,6 @@ CONFIG_GPIO_WM831X                              policy<{'amd64': 'm', 'arm64': '
 CONFIG_GPIO_WM8350                              policy<{'amd64': 'm', 'arm64': 'm', 'armhf': 'm', 'i386': 'm', 'ppc64el': 'm'}>
 CONFIG_GPIO_WM8994                              policy<{'amd64': 'm', 'arm64': 'm', 'armhf': 'm', 'i386': 'm', 'ppc64el': 'm'}>
 #
-CONFIG_GPIO_TWL4030                             mark<ENFORCED> note<LP:#921934>
 
 # Menu: Device Drivers >> GPIO Support >> Memory mapped GPIO drivers
 CONFIG_GPIO_74XX_MMIO                           policy<{'arm64': 'm', 'armhf': 'm', 'ppc64el': 'm'}>
@@ -1767,7 +1765,6 @@ CONFIG_DRM_MESON_DW_HDMI                        policy<{'armhf': 'm'}>
 CONFIG_DRM_PL111                                policy<{'arm64': 'm', 'armhf': 'm'}>
 CONFIG_DRM_TVE200                               policy<{'armhf': 'm'}>
 #
-CONFIG_DRM_MGAG200                              note<LP#1693337>
 CONFIG_DRM_BOCHS                                note<LP#1378648>
 CONFIG_DRM_STI                                  note<LP#1398458>
 
@@ -6839,7 +6836,6 @@ CONFIG_SOUND                                    policy<{'amd64': 'm', 'arm64': '
 CONFIG_SOUND_OSS_CORE_PRECLAIM                  policy<{'amd64': 'n', 'arm64': 'n', 'armhf': 'n', 'i386': 'n', 'ppc64el': 'n'}>
 #
 CONFIG_SOUND                                    note<not autoloadable on omap>
-CONFIG_SOUND_OSS_CORE_PRECLAIM                  mark<ENFORCED> note<LP#1105230 LP#1385510>
 
 # Menu: Device Drivers >> Sound card support >> Advanced Linux Sound Architecture
 CONFIG_SND                                      policy<{'amd64': 'm', 'arm64': 'm', 'armhf': 'y', 'i386': 'm', 'ppc64el': 'm'}>
@@ -8368,7 +8364,6 @@ CONFIG_REGULATOR_WM8400                         policy<{'amd64': 'm', 'arm64': '
 CONFIG_REGULATOR_WM8994                         policy<{'amd64': 'm', 'arm64': 'm', 'armhf': 'm', 'i386': 'm', 'ppc64el': 'm'}>
 #
 CONFIG_REGULATOR_FIXED_VOLTAGE                  note<boot essential on arm>
-CONFIG_REGULATOR_TWL4030                        mark<ENFORCED> note<boot requisite for omap4>
 CONFIG_REGULATOR_TPS65217                       mark<ENFORCED> note<boot essential on AM335x>
 
 # Menu: Device Drivers >> Watchdog Timer Support
@@ -11545,7 +11540,7 @@ CONFIG_SECURITY_DEFAULT_DISPLAY_APPARMOR        policy<{'amd64': 'y', 'arm64': '
 CONFIG_SECURITY_DEFAULT_DISPLAY_NAME            policy<{'amd64': '"apparmor"', 'arm64': '"apparmor"', 'armhf': '"apparmor"', 'i386': '"apparmor"', 'ppc64el': '"apparmor"', 's390x': '"apparmor"'}>
 
 CONFIG_SECURITY                                 mark<ENFORCED>
-CONFIG_LSM_MMAP_MIN_ADDR                        mark<ENFORCED> flag<REVIEW>
+CONFIG_SECURITY_SMACK                           mark<ENFORCED>
 CONFIG_SECURITY_YAMA                            mark<ENFORCED>
 CONFIG_SECURITY_DEFAULT_DISPLAY_NAME            mark<ENFORCED>
 
