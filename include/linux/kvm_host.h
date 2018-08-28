@@ -1049,6 +1049,8 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
 #define KVM_MAX_IRQ_ROUTES 4096 //FIXME: we can have more than that...
 #elif defined(CONFIG_ARM64)
 #define KVM_MAX_IRQ_ROUTES 4096
+#elif defined(CONFIG_X86)
+#define KVM_MAX_IRQ_ROUTES 2048
 #else
 #define KVM_MAX_IRQ_ROUTES 1024
 #endif
@@ -1105,7 +1107,6 @@ static inline void kvm_irq_routing_update(struct kvm *kvm)
 {
 }
 #endif
-void kvm_arch_irq_routing_update(struct kvm *kvm);
 
 static inline int kvm_ioeventfd(struct kvm *kvm, struct kvm_ioeventfd *args)
 {
@@ -1113,6 +1114,8 @@ static inline int kvm_ioeventfd(struct kvm *kvm, struct kvm_ioeventfd *args)
 }
 
 #endif /* CONFIG_HAVE_KVM_EVENTFD */
+
+void kvm_arch_irq_routing_update(struct kvm *kvm);
 
 static inline void kvm_make_request(int req, struct kvm_vcpu *vcpu)
 {

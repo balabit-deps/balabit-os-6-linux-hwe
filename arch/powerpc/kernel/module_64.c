@@ -289,10 +289,7 @@ static void dedotify_versions(struct modversion_info *vers,
 		}
 }
 
-/*
- * Undefined symbols which refer to .funcname, hack to funcname. Make .TOC.
- * seem to be defined (value set later).
- */
+/* Undefined symbols which refer to .funcname, hack to funcname (or .TOC.) */
 static void dedotify(Elf64_Sym *syms, unsigned int numsyms, char *strtab)
 {
 	unsigned int i;
@@ -300,11 +297,8 @@ static void dedotify(Elf64_Sym *syms, unsigned int numsyms, char *strtab)
 	for (i = 1; i < numsyms; i++) {
 		if (syms[i].st_shndx == SHN_UNDEF) {
 			char *name = strtab + syms[i].st_name;
-			if (name[0] == '.') {
-				if (strcmp(name+1, "TOC.") == 0)
-					syms[i].st_shndx = SHN_ABS;
-				syms[i].st_name++;
-			}
+			if (name[0] == '.')
+				memmove(name, name+1, strlen(name));
 		}
 	}
 }
@@ -320,7 +314,7 @@ static Elf64_Sym *find_dot_toc(Elf64_Shdr *sechdrs,
 	numsyms = sechdrs[symindex].sh_size / sizeof(Elf64_Sym);
 
 	for (i = 1; i < numsyms; i++) {
-		if (syms[i].st_shndx == SHN_ABS
+		if (syms[i].st_shndx == SHN_UNDEF
 		    && strcmp(strtab + syms[i].st_name, "TOC.") == 0)
 			return &syms[i];
 	}
@@ -487,12 +481,22 @@ static bool is_early_mcount_callsite(u32 *instruction)
    restore r2. */
 static int restore_r2(u32 *instruction, struct module *me)
 {
-	if (is_early_mcount_callsite(instruction - 1))
+	u32 *prev_insn = instruction - 1;
+
+	if (is_early_mcount_callsite(prev_insn))
+		return 1;
+
+	/*
+	 * Make sure the branch isn't a sibling call.  Sibling calls aren't
+	 * "link" branches and they don't return, so they don't need the r2
+	 * restore afterwards.
+	 */
+	if (!instr_is_relative_link_branch(*prev_insn))
 		return 1;
 
 	if (*instruction != PPC_INST_NOP) {
-		pr_err("%s: Expect noop after relocate, got %08x\n",
-		       me->name, *instruction);
+		pr_err("%s: Expected nop after call, got %08x at %pS\n",
+			me->name, *instruction, instruction);
 		return 0;
 	}
 	/* ld r2,R2_STACK_OFFSET(r1) */
@@ -614,7 +618,8 @@ int apply_relocate_add(Elf64_Shdr *sechdrs,
 
 		case R_PPC_REL24:
 			/* FIXME: Handle weak symbols here --RR */
-			if (sym->st_shndx == SHN_UNDEF) {
+			if (sym->st_shndx == SHN_UNDEF ||
+			    sym->st_shndx == SHN_LIVEPATCH) {
 				/* External: go via stub */
 				value = stub_for_addr(sechdrs, value, me);
 				if (!value)
