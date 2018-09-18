@@ -645,7 +645,6 @@ CONFIG_CDROM_PKTCDVD_WCACHE                     mark<DANGEROUS>
 CONFIG_XEN_BLKDEV_FRONTEND                      note<not autoloadable -- XEN paravirt support>
 CONFIG_VIRTIO_BLK                               note<KVM paravirt support -- not autoloadable>
 CONFIG_BLK_DEV_RAM                              note<LP #1593293>
-CONFIG_BLK_DEV_RAM_SIZE                         mark<ENFORCED> note<Ramdisk size should be a minimum of 64M> flag<REVIEW>
 
 # Menu: Device Drivers >> Block devices >> Parallel port IDE device support
 CONFIG_PARIDE                                   policy<{'amd64': 'm', 'armhf': 'm', 'i386': 'm', 'ppc64el': 'm'}>
