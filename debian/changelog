@@ -1,3 +1,9 @@
+linux-hwe (4.15.0-34.37bb1) xenial; urgency=medium
+
+  * Imported Balabit patches
+
+ -- Balabit Platform Team <devnull@dev.null> Tue, 18 Sep 2018 14:04:07 +0200
+
 linux-hwe (4.15.0-34.37~16.04.1) xenial; urgency=medium
 
   * linux-hwe: 4.15.0-34.37~16.04.1 -proposed tracker (LP: #1788760)
