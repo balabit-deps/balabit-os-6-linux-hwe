@@ -1,8 +1,14 @@
+linux-hwe (4.15.0-34.37bb2) xenial; urgency=medium
+
+  * Applied bionic configs
+
+ -- Balabit Platform Team <devnull@dev.null>  Wed, 19 Sep 2018 12:05:05 +0200
+
 linux-hwe (4.15.0-34.37bb1) xenial; urgency=medium
 
   * Imported Balabit patches
 
- -- Balabit Platform Team <devnull@dev.null> Tue, 18 Sep 2018 14:04:07 +0200
+ -- Balabit Platform Team <devnull@dev.null>  Tue, 18 Sep 2018 14:04:07 +0200
 
 linux-hwe (4.15.0-34.37~16.04.1) xenial; urgency=medium
 

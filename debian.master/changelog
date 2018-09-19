@@ -1,3 +1,9 @@
+linux (4.15.0-34.37bb2) bionic; urgency=medium
+
+  * Applied bionic configs
+
+ -- Balabit Platform Team <devnull@dev.null>  Wed, 19 Sep 2018 12:05:05 +0200
+
 linux (4.15.0-34.37bb1) bionic; urgency=medium
 
   * Imported Balabit patches
