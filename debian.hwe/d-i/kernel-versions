@@ -1,5 +1,6 @@
 # arch	version		flavour		installedname			suffix	bdep
 amd64	-		generic		-				-	-
+amd64	-		xcb		-				-	-
 
 i386	-		generic		-				-	-
 
@@ -7,6 +8,7 @@ armhf	-		generic		-				-	-
 armhf	-		generic-lpae	-				-	-
 
 arm64	-		generic		-				-	-
+arm64	-		snapdragon	-				-	-
 
 ppc64el	-		generic		-				-	-
 

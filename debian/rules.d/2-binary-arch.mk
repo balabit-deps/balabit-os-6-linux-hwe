@@ -21,7 +21,7 @@ $(stampdir)/stamp-prepare-%: config-prepare-check-%
 	@echo Debug: $@
 	@touch $@
 $(stampdir)/stamp-prepare-tree-%: target_flavour = $*
-$(stampdir)/stamp-prepare-tree-%: $(commonconfdir)/config.onefile.%
+$(stampdir)/stamp-prepare-tree-%: $(commonconfdir)/config.common.$(family) $(archconfdir)/config.common.$(arch) $(archconfdir)/config.flavour.%
 	@echo Debug: $@
 	install -d $(builddir)/build-$*
 	touch $(builddir)/build-$*/ubuntu-build
@@ -68,7 +68,7 @@ $(stampdir)/stamp-build-%: bldimg = $(call custom_override,build_image,$*)
 $(stampdir)/stamp-build-%: enable_zfs = $(call custom_override,do_zfs,$*)
 $(stampdir)/stamp-build-%: $(stampdir)/stamp-prepare-%
 	@echo Debug: $@ build_image $(build_image) bldimg $(bldimg)
-	$(build_cd) $(kmake) $(build_O) $(conc_level) $(bldimg) $(if $(filter true,$(do_dtbs)),dtbs)
+	$(build_cd) $(kmake) $(build_O) $(conc_level) $(bldimg) $(if $(filter false,$(skipmodules)),modules) $(if $(filter true,$(do_dtbs)),dtbs)
 
 	$(if $(filter true,$(enable_zfs)),$(call build_zfs))
 
@@ -76,9 +76,9 @@ $(stampdir)/stamp-build-%: $(stampdir)/stamp-prepare-%
 
 define install_zfs =
 	cd $(builddir)/build-$*/spl/module; \
-		$(kmake) -C $(builddir)/build-$* SUBDIRS=`pwd` $(splopts)
+		$(kmake) -C $(builddir)/build-$* SUBDIRS=`pwd` $(modules_install) $(splopts)
 	cd $(builddir)/build-$*/zfs/module; \
-		$(kmake) -C $(builddir)/build-$* SUBDIRS=`pwd` $(zfsopts)
+		$(kmake) -C $(builddir)/build-$* SUBDIRS=`pwd` $(modules_install) $(zfsopts)
 endef
 
 define install_control =
@@ -181,7 +181,7 @@ ifeq ($(no_dumpfile),)
 	chmod 0600 $(pkgdir)/boot/vmcoreinfo-$(abi_release)-$*
 endif
 
-	$(build_cd) $(kmake) $(build_O) $(conc_level) $(vdso) \
+	$(build_cd) $(kmake) $(build_O) $(conc_level) $(modules_install) $(vdso) \
 		INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=$(pkgdir)/ \
 		INSTALL_FW_PATH=$(pkgdir)/lib/firmware/$(abi_release)-$*
 
@@ -282,7 +282,7 @@ ifneq ($(skipdbg),true)
 	# Debug image is simple
 	install -m644 -D $(builddir)/build-$*/vmlinux \
 		$(dbgpkgdir)/usr/lib/debug/boot/vmlinux-$(abi_release)-$*
-	$(build_cd) $(kmake) $(build_O) $(vdso) \
+	$(build_cd) $(kmake) $(build_O) $(modules_install) $(vdso) \
 		INSTALL_MOD_PATH=$(dbgpkgdir)/usr/lib/debug
 	# Add .gnu_debuglink sections to each stripped .ko
 	# pointing to unstripped verson
@@ -342,6 +342,34 @@ endif
 
 	# Now the header scripts
 	$(call install_control,$(hdrs_pkg_name)-$*,headers,postinst)
+
+	# At the end of the package prep, call the tests
+	DPKG_ARCH="$(arch)" KERN_ARCH="$(build_arch)" FLAVOUR="$*"	\
+	 VERSION="$(abi_release)" REVISION="$(revision)"		\
+	 PREV_REVISION="$(prev_revision)" ABI_NUM="$(abinum)"		\
+	 PREV_ABI_NUM="$(prev_abinum)" BUILD_DIR="$(builddir)/build-$*"	\
+	 INSTALL_DIR="$(pkgdir)" SOURCE_DIR="$(CURDIR)"			\
+	 run-parts -v $(DROOT)/tests-build
+
+	#
+	# Remove files which are generated at installation by postinst,
+	# except for modules.order and modules.builtin
+	#
+	# NOTE: need to keep this list in sync with postrm
+	#
+ifeq ($(skipmodules),false)
+	mkdir $(pkgdir)/lib/modules/$(abi_release)-$*/_
+	mv $(pkgdir)/lib/modules/$(abi_release)-$*/modules.order \
+		$(pkgdir)/lib/modules/$(abi_release)-$*/_
+	if [ -f $(pkgdir)/lib/modules/$(abi_release)-$*/modules.builtin ] ; then \
+	    mv $(pkgdir)/lib/modules/$(abi_release)-$*/modules.builtin \
+		$(pkgdir)/lib/modules/$(abi_release)-$*/_; \
+	fi
+	rm -f $(pkgdir)/lib/modules/$(abi_release)-$*/modules.*
+	mv $(pkgdir)/lib/modules/$(abi_release)-$*/_/* \
+		$(pkgdir)/lib/modules/$(abi_release)-$*
+	rmdir $(pkgdir)/lib/modules/$(abi_release)-$*/_
+endif
 
 ifeq ($(do_linux_tools),true)
 	# Create the linux-tools tool links
